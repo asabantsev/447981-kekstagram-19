@@ -1,8 +1,38 @@
 'use strict';
 
-var PHOTO_TITLES = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
-var COMMENTS_TEXTS = ['Всё отлично!', 'В целом всё неплохо. Но не всё.', 'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.', 'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.', 'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.', 'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'];
-var NAMES = ['Иван', 'Хуан Себастьян', 'Мария', 'Кристоф', 'Виктор', 'Юлия', 'Люпита', 'Вашингтон'];
+var PHOTO_TITLES = [
+  'Всё отлично!',
+  'В целом всё неплохо. Но не всё.',
+  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
+var COMMENTS_TEXTS = [
+  'Всё отлично!',
+  'В целом всё неплохо. Но не всё.',
+  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
+var NAMES = [
+  'Иван',
+  'Хуан Себастьян',
+  'Мария',
+  'Кристоф',
+  'Виктор',
+  'Юлия',
+  'Люпита',
+  'Вашингтон'
+];
+var ERROR_MESSAGES = [
+  'Хэш-тег должен начинаться с символа "#"',
+  'Хеш-тег не может состоять только из символа "#"',
+  'Один и тот же хэш-тег не может быть использован дважды',
+  'Нельзя указать больше пяти хэш-тегов',
+  'Максимальная длина одного хэш-тега 20 символов, включая символ "#"'
+];
 var LIKES_MIN = 15;
 var LIKES_MAX = 200;
 var AVATAR_MIN = 1;
@@ -16,6 +46,10 @@ var MIN_SIZE = 25;
 var MAX_SIZE = 100;
 var HASHTAGS_MAX_COUNT = 5;
 var HASHTAG_MAX_LENGTH = 20;
+var CHROME_COEFFICIENT = 0.01;
+var SEPIA_COEFFICIENT = 0.01;
+var PHOBOS_COEFFICIENT = 0.03;
+var HEAT_COEFFICIENT = 0.02;
 
 var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 var userPictures = document.querySelector('.pictures');
@@ -55,8 +89,7 @@ function renderPhoto(photo) {
   var pictureElement = pictureTemplate.cloneNode(true);
 
   pictureElement.querySelector('.picture__img').src = photo.url;
-  // pictureElement.querySelector('.picture__img').title = photo.description;
-  pictureElement.querySelector('.picture__comments').textContent = photo.comments;
+  pictureElement.querySelector('.picture__comments').textContent = photo.comments.length;
   pictureElement.querySelector('.picture__likes').textContent = photo.likes;
 
   return pictureElement;
@@ -117,7 +150,7 @@ function createCommentTemplate(container) {
 // изменение большой фотографии
 function renderPictureBig(photos) {
   // pictureBig.classList.remove('hidden');
-  body.classList.add('modal-open');
+  // body.classList.add('modal-open');
 
   pictureBig.querySelector('.big-picture__img').querySelector('img').src = photos[0].url;
   pictureBig.querySelector('.likes-count').textContent = photos[0].likes;
@@ -156,12 +189,19 @@ var onInputHashtagFocus = function () {
   document.removeEventListener('keydown', onDialogEcsPress);
 };
 
+var resetUserImgSettings = function () {
+  levelBlock.classList.add('hidden');
+  picturePreview.removeAttribute('class');
+  picturePreview.removeAttribute('style');
+  picturePreview.style.transform = 'scale(' + 100 / 100 + ')';
+  pictureScale.value = '100';
+};
+
 var openDialog = function () {
   editPicture.classList.remove('hidden');
   body.classList.add('modal-open');
   pictureScale.value = DEFAULT_SIZE;
-  picturePreview.querySelector('img').style.transform = 'scale(' + (pictureScale.value / 100) + ')';
-  picturePreview.querySelector('img').classList = 'effects__preview--none';
+  picturePreview.style.transform = 'scale(' + (pictureScale.value / 100) + ')';
   levelBlock.classList.add('hidden');
   document.addEventListener('keydown', onDialogEcsPress);
   inputHashtag.addEventListener('focus', onInputHashtagFocus);
@@ -195,19 +235,19 @@ uploadCancel.addEventListener('click', function () {
 var buttonSmaller = document.querySelector('.scale__control--smaller');
 var buttonBigger = document.querySelector('.scale__control--bigger');
 var pictureScale = document.querySelector('.scale__control--value');
-var picturePreview = document.querySelector('.img-upload__preview');
+var picturePreview = document.querySelector('.img-upload__preview').querySelector('img');
 
 var sizeSmaller = function () {
   if (pictureScale.value > MIN_SIZE) {
     pictureScale.value = pictureScale.value - SIZE_STEP;
-    picturePreview.querySelector('img').style.transform = 'scale(' + (pictureScale.value / 100) + ')';
+    picturePreview.style.transform = 'scale(' + (pictureScale.value / 100) + ')';
   }
 };
 
 var sizeBigger = function () {
   if (pictureScale.value < MAX_SIZE) {
     pictureScale.value = parseInt(pictureScale.value, 10) + SIZE_STEP;
-    picturePreview.querySelector('img').style.transform = 'scale(' + (pictureScale.value / 100) + ')';
+    picturePreview.style.transform = 'scale(' + (pictureScale.value / 100) + ')';
   }
 };
 
@@ -222,33 +262,37 @@ buttonBigger.addEventListener('click', function () {
 // Применение эффекта для изображения
 var effectsList = document.querySelector('.effects__list');
 
-effectsList.addEventListener('change', function (evt) {
-  picturePreview.querySelector('img').classList = 'effects__preview--' + evt.target.value;
-  if (evt.target.value === 'none') {
-    picturePreview.querySelector('img').style.filter = '';
-    levelBlock.classList.add('hidden');
-  }
-  if (evt.target.value === 'chrome') {
-    picturePreview.querySelector('img').style.filter = 'grayscale(1)';
+var changeEffects = function () {
+  if (effectsList.querySelector('input:checked').value !== 'none') {
     levelBlock.classList.remove('hidden');
   }
-  if (evt.target.value === 'sepia') {
-    picturePreview.querySelector('img').style.filter = 'sepia(1)';
-    levelBlock.classList.remove('hidden');
+
+  switch (effectsList.querySelector('input:checked').value) {
+    case 'chrome':
+      picturePreview.classList.add('effects__preview--chrome');
+      break;
+    case 'sepia':
+      picturePreview.classList.add('effects__preview--sepia');
+      break;
+    case 'marvin':
+      picturePreview.classList.add('effects__preview--marvin');
+      break;
+    case 'phobos':
+      picturePreview.classList.add('effects__preview--phobos');
+      break;
+    case 'heat':
+      picturePreview.classList.add('effects__preview--heat');
+      break;
   }
-  if (evt.target.value === 'marvin') {
-    picturePreview.querySelector('img').style.filter = 'invert(100%)';
-    levelBlock.classList.remove('hidden');
-  }
-  if (evt.target.value === 'phobos') {
-    picturePreview.querySelector('img').style.filter = 'blur(3px)';
-    levelBlock.classList.remove('hidden');
-  }
-  if (evt.target.value === 'heat') {
-    picturePreview.querySelector('img').style.filter = 'brightness(3)';
-    levelBlock.classList.remove('hidden');
-  }
-});
+};
+
+var onEffectsItemClick = function () {
+  resetUserImgSettings();
+
+  changeEffects();
+};
+
+effectsList.addEventListener('click', onEffectsItemClick);
 
 var levelBlock = document.querySelector('.effect-level');
 var levelPin = document.querySelector('.effect-level__pin');
@@ -259,20 +303,23 @@ var setEffectValue = function () {
   var levelBarWidth = Math.round(levelBar.getBoundingClientRect().width);
   var levelEffectWidth = Math.round(levelPin.getBoundingClientRect().x - levelBar.getBoundingClientRect().x);
   levelValue.value = Math.round(levelEffectWidth * 100 / levelBarWidth);
-  if (picturePreview.querySelector('img').className === 'effects__preview--chrome') {
-    picturePreview.querySelector('img').style.filter = 'grayscale(' + levelValue.value / 100 + ')';
-  }
-  if (picturePreview.querySelector('img').className === 'effects__preview--sepia') {
-    picturePreview.querySelector('img').style.filter = 'sepia(' + levelValue.value / 100 + ')';
-  }
-  if (picturePreview.querySelector('img').className === 'effects__preview--marvin') {
-    picturePreview.querySelector('img').style.filter = 'invert(' + levelValue.value + '%)';
-  }
-  if (picturePreview.querySelector('img').className === 'effects__preview--phobos') {
-    picturePreview.querySelector('img').style.filter = 'blur(' + levelValue.value * 3 / 100 + 'px)';
-  }
-  if (picturePreview.querySelector('img').className === 'effects__preview--heat') {
-    picturePreview.querySelector('img').style.filter = 'brightness(' + levelValue.value * 3 / 100 + 1 + ')';
+
+  switch (picturePreview.className) {
+    case 'effects__preview--chrome':
+      picturePreview.style.filter = 'grayscale(' + levelValue.value * CHROME_COEFFICIENT + ')';
+      break;
+    case 'effects__preview--sepia':
+      picturePreview.style.filter = 'sepia(' + levelValue.value * SEPIA_COEFFICIENT + ')';
+      break;
+    case 'effects__preview--marvin':
+      picturePreview.style.filter = 'invert(' + levelValue.value + '%)';
+      break;
+    case 'effects__preview--phobos':
+      picturePreview.style.filter = 'blur(' + levelValue.value * PHOBOS_COEFFICIENT + 'px)';
+      break;
+    case 'effects__preview--heat':
+      picturePreview.style.filter = 'brightness(' + levelValue.value * HEAT_COEFFICIENT + 1 + ')';
+      break;
   }
 };
 
@@ -281,42 +328,52 @@ levelPin.addEventListener('mouseup', function () {
 });
 
 // Валидация хеш-тегов
-var detectDuplicateHashtag = function (tag, index, hashes) {
-  var tags = hashes.slice(0);
+var detectDuplicateHashtag = function (hashtags) {
+  var flag = false;
 
-  tags.splice(index, 1);
+  for (var i = 0; i < hashtags.length; i++) {
+    for (var j = i + 1; j < hashtags.length; j++) {
+      if (hashtags[i].toLowerCase() === hashtags[j].toLowerCase()) {
+        flag = true;
+      }
+    }
+  }
 
-  return tags
-    .map(function (hashtag) {
-      return hashtag.toLowerCase();
-    })
-    .includes(tag.toLowerCase());
+  return flag;
+};
+
+var removeSpacesInHashtags = function (hashtags) {
+
+  for (var i = 0; i < hashtags.length; i++) {
+    if (hashtags[i] === '') {
+      hashtags.splice(i, 1);
+      i--;
+    }
+  }
 };
 
 var validateHashtags = function (evt) {
-  var hashes = evt.target.value
-    .split(' ')
-    .filter(function (tag) {
-      return tag;
-    });
+  var hashtags = evt.target.value.split(' ');
 
-  var errorMessage = '';
+  removeSpacesInHashtags(hashtags);
 
-  hashes.forEach(function (tag, index) {
-    if (tag[0] !== '#') {
-      errorMessage = 'Хэш-тег должен начинаться с символа "#"';
-    } else if (tag === '#') {
-      errorMessage = 'Хеш-тег не может состоять только из символа "#"';
-    } else if (detectDuplicateHashtag(tag, index, hashes)) {
-      errorMessage = 'Один и тот же хэш-тег не может быть использован дважды';
-    } else if (hashes.length > HASHTAGS_MAX_COUNT) {
-      errorMessage = 'Нельзя указать больше пяти хэш-тегов';
-    } else if (tag.length > HASHTAG_MAX_LENGTH) {
-      errorMessage = 'Максимальная длина одного хэш-тега 20 символов, включая символ "#"';
+  var errorMessage = evt.target.setCustomValidity('');
+
+  for (var i = 0; i < hashtags.length; i++) {
+    if (hashtags[i][0] !== '#') {
+      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[0]);
+    } else if (hashtags[i] === '#') {
+      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[1]);
+    } else if (detectDuplicateHashtag(hashtags)) {
+      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[2]);
+    } else if (hashtags.length > HASHTAGS_MAX_COUNT) {
+      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[3]);
+    } else if (hashtags[i].length > HASHTAG_MAX_LENGTH) {
+      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[4]);
+    } else {
+      errorMessage = errorMessage;
     }
-  });
-
-  evt.target.setCustomValidity(errorMessage);
+  }
 };
 
 inputHashtag.addEventListener('change', oninputHashtagChange);
