@@ -40,6 +40,7 @@ var AVATAR_MAX = 6;
 var COMMENTS_MAX = 5;
 var PHOTOS_NUMBER = 25;
 var ESC_KEY = 'Escape';
+var ENTER_KEY = 'Enter';
 var DEFAULT_SIZE = 100;
 var SIZE_STEP = 25;
 var MIN_SIZE = 25;
@@ -91,6 +92,7 @@ function renderPhoto(photo) {
   pictureElement.querySelector('.picture__img').src = photo.url;
   pictureElement.querySelector('.picture__comments').textContent = photo.comments.length;
   pictureElement.querySelector('.picture__likes').textContent = photo.likes;
+  pictureElement.querySelector('.picture__img').alt = photo.description;
 
   return pictureElement;
 }
@@ -149,9 +151,6 @@ function createCommentTemplate(container) {
 
 // изменение большой фотографии
 function renderPictureBig(photos) {
-  // pictureBig.classList.remove('hidden');
-  // body.classList.add('modal-open');
-
   pictureBig.querySelector('.big-picture__img').querySelector('img').src = photos[0].url;
   pictureBig.querySelector('.likes-count').textContent = photos[0].likes;
   pictureBig.querySelector('.comments-count').textContent = photos[0].comments.length;
@@ -179,13 +178,19 @@ renderPictureBig(createPhotosObjectsArray(PHOTOS_NUMBER));
 var uploadPicture = document.querySelector('#upload-file');
 var editPicture = document.querySelector('.img-upload__overlay');
 var uploadCancel = editPicture.querySelector('#upload-cancel');
+var previewCancel = pictureBig.querySelector('#picture-cancel');
 var inputHashtag = document.querySelector('.text__hashtags');
+var inputComment = document.querySelector('.text__description');
 
 var oninputHashtagChange = function (evt) {
   validateHashtags(evt);
 };
 
 var onInputHashtagFocus = function () {
+  document.removeEventListener('keydown', onDialogEcsPress);
+};
+
+var onInputCommentFocus = function () {
   document.removeEventListener('keydown', onDialogEcsPress);
 };
 
@@ -208,6 +213,7 @@ var openDialog = function () {
   inputHashtag.addEventListener('blur', function () {
     document.addEventListener('keydown', onDialogEcsPress);
   });
+  inputComment.addEventListener('focus', onInputCommentFocus);
 };
 
 var closeDialog = function () {
@@ -217,9 +223,21 @@ var closeDialog = function () {
   document.removeEventListener('keydown', onDialogEcsPress);
 };
 
+var closePreview = function () {
+  pictureBig.classList.add('hidden');
+  body.classList.remove('modal-open');
+  document.removeEventListener('keydown', onDialogEcsPress);
+};
+
 var onDialogEcsPress = function (evt) {
   if (evt.key === ESC_KEY) {
     closeDialog();
+  }
+};
+
+var onPreviewEscPress = function (evt) {
+  if (evt.key === ESC_KEY) {
+    closePreview();
   }
 };
 
@@ -357,23 +375,53 @@ var validateHashtags = function (evt) {
 
   removeSpacesInHashtags(hashtags);
 
-  var errorMessage = evt.target.setCustomValidity('');
+  var errorMessage = '';
 
   for (var i = 0; i < hashtags.length; i++) {
-    if (hashtags[i][0] !== '#') {
-      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[0]);
-    } else if (hashtags[i] === '#') {
-      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[1]);
-    } else if (detectDuplicateHashtag(hashtags)) {
-      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[2]);
-    } else if (hashtags.length > HASHTAGS_MAX_COUNT) {
-      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[3]);
-    } else if (hashtags[i].length > HASHTAG_MAX_LENGTH) {
-      errorMessage = evt.target.setCustomValidity(ERROR_MESSAGES[4]);
-    } else {
-      errorMessage = errorMessage;
+    switch (true) {
+      case hashtags[i].length > 0 && hashtags[i][0] !== '#':
+        errorMessage = ERROR_MESSAGES[0];
+        break;
+      case hashtags[i] === '#':
+        errorMessage = ERROR_MESSAGES[1];
+        break;
+      case detectDuplicateHashtag(hashtags):
+        errorMessage = ERROR_MESSAGES[2];
+        break;
+      case hashtags.length > HASHTAGS_MAX_COUNT:
+        errorMessage = ERROR_MESSAGES[3];
+        break;
+      case hashtags[i].length > HASHTAG_MAX_LENGTH:
+        errorMessage = ERROR_MESSAGES[4];
+        break;
     }
   }
+
+  inputHashtag = evt.target.setCustomValidity(errorMessage);
+
 };
 
 inputHashtag.addEventListener('change', oninputHashtagChange);
+
+// просмотр любой фотографии в полноразмерном режиме
+var smallPicture = document.querySelectorAll('.picture');
+
+var smallPicturePreview = function (evt) {
+  pictureBig.classList.remove('hidden');
+  document.addEventListener('keydown', onPreviewEscPress);
+  previewCancel.addEventListener('click', function () {
+    closePreview();
+  });
+  pictureBig.querySelector('img').src = evt.target.src;
+  pictureBig.querySelector('.social__caption').textContent = evt.target.alt;
+};
+
+for (var i = 0; i < smallPicture.length; i++) {
+  smallPicture[i].addEventListener('click', smallPicturePreview);
+  smallPicture[i].querySelector('img').setAttribute('tabindex', [i + 1]);
+  smallPicture[i].addEventListener('keydown', function (evt) {
+    if (evt.key === ENTER_KEY) {
+      smallPicturePreview(evt);
+    }
+  });
+}
