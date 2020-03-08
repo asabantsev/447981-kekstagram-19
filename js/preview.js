@@ -41,6 +41,6 @@
   pictureBig.querySelector('.social__comment-count').classList.add('hidden');
   pictureBig.querySelector('.comments-loader').classList.add('hidden');
 
-  renderPictureBig(window.createPhotosObjectsArray(PHOTOS_NUMBER));
+  renderPictureBig(window.data.createPhotosObjectsArray(PHOTOS_NUMBER));
 
 })();

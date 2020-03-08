@@ -11,7 +11,7 @@
     pictureBig.classList.remove('hidden');
     document.addEventListener('keydown', window.onPreviewEscPress);
     previewCancel.addEventListener('click', function () {
-      window.closePreview();
+      window.form.closePreview();
     });
     pictureBig.querySelector('img').src = evt.target.src;
     pictureBig.querySelector('.social__caption').textContent = evt.target.alt;
@@ -21,7 +21,7 @@
     smallPicture[i].addEventListener('click', smallPicturePreview);
     smallPicture[i].querySelector('img').setAttribute('tabindex', [i + 1]);
     smallPicture[i].addEventListener('keydown', function (evt) {
-      window.isEnterEvent(evt, smallPicturePreview(evt));
+      window.util.isEnterEvent(evt, smallPicturePreview(evt));
     });
   }
 })();
