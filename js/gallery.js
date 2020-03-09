@@ -29,6 +29,6 @@
     userPictures.appendChild(fragment);
   }
 
-  renderUserPictures(window.createPhotosObjectsArray(PHOTOS_NUMBER));
+  renderUserPictures(window.data.createPhotosObjectsArray(PHOTOS_NUMBER));
 })();
 

@@ -41,7 +41,7 @@
   }
 
   // создание объекта-фотография
-  function createPhotoObject(photoNumber) {
+  var createPhotoObject = function (photoNumber) {
     var photoObject = {};
 
     photoObject.url = 'photos/' + photoNumber + '.jpg';
@@ -50,10 +50,10 @@
     photoObject.comments = createCommentsObjectsArray();
 
     return photoObject;
-  }
+  };
 
   // создание массива объектов-фотографий
-  window.createPhotosObjectsArray = function (photosCount) {
+  var createPhotosObjectsArray = function (photosCount) {
     var photoObjectsArray = [];
 
     for (var i = 0; i < photosCount; i++) {
@@ -64,7 +64,7 @@
   };
 
   // создание объекта-комментария
-  function createCommentObject() {
+  var createCommentObject = function () {
     var commentObject = {};
 
     commentObject.avatar = 'img/avatar-' + randomInteger(AVATAR_MIN, AVATAR_MAX) + '.svg';
@@ -72,7 +72,7 @@
     commentObject.name = NAMES[randomInteger(0, NAMES.length - 1)];
 
     return commentObject;
-  }
+  };
 
   // создание массива объектов-комментариев
   function createCommentsObjectsArray() {
@@ -85,4 +85,9 @@
 
     return commentsObjectsArray;
   }
+
+  window.data = {
+    createPhotosObjectsArray: createPhotosObjectsArray
+  };
+
 })();
