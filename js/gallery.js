@@ -1,14 +1,16 @@
 'use strict';
 
 (function () {
-  var PHOTOS_NUMBER = 25;
-
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
   var userPictures = document.querySelector('.pictures');
 
   // отрисовка фотографии по шаблону
-  function renderPhoto(photo) {
+  var renderPhoto = function (photo) {
     var pictureElement = pictureTemplate.cloneNode(true);
+
+    pictureElement.addEventListener('click', function () {
+      onPictureClick(photo);
+    });
 
     pictureElement.querySelector('.picture__img').src = photo.url;
     pictureElement.querySelector('.picture__comments').textContent = photo.comments.length;
@@ -16,10 +18,13 @@
     pictureElement.querySelector('.picture__img').alt = photo.description;
 
     return pictureElement;
-  }
+  };
 
-  // добавление фотографий пользователей на страницу
-  function renderUserPictures(photos) {
+  var onPictureClick = function (photos) {
+    window.preview.renderPictureBig(photos);
+  };
+
+  var successHandler = function (photos) {
     var fragment = document.createDocumentFragment();
 
     photos.forEach(function (photo) {
@@ -27,8 +32,20 @@
     });
 
     userPictures.appendChild(fragment);
-  }
+  };
 
-  renderUserPictures(window.data.createPhotosObjectsArray(PHOTOS_NUMBER));
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '10px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  window.backend.load(successHandler, errorHandler);
 })();
 
