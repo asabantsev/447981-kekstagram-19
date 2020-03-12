@@ -59,10 +59,31 @@
 
   uploadCancel.addEventListener('click', function () {
     closeDialog();
+    window.util.resetForm();
   });
+
+  var form = document.querySelector('.img-upload__form');
+  form.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(form), onLoad, onError);
+
+    evt.preventDefault();
+  });
+
+  var onLoad = function () {
+    window.form.closeDialog();
+    window.util.resetForm();
+    window.openSuccessMessage();
+  };
+
+  var onError = function () {
+    window.form.closeDialog();
+    window.util.resetForm();
+    window.openErrorMessage();
+  };
 
   window.form = {
     closePreview: closePreview,
+    closeDialog: closeDialog,
     onPreviewEscPress: onPreviewEscPress
   };
 

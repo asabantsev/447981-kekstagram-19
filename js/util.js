@@ -12,6 +12,10 @@
   var levelDepth = uploadField.querySelector('.effect-level__depth');
   var picturePreview = uploadField.querySelector('.img-upload__preview img');
   var pictureScale = uploadField.querySelector('.scale__control--value');
+  var imgUploadInput = uploadField.querySelector('.img-upload__input');
+  var hashtagsInput = uploadField.querySelector('.text__hashtags');
+  var commentUploadInput = uploadField.querySelector('.text__description');
+  var effectOriginalInput = uploadField.querySelector('#effect-none');
 
   var isEscEvent = function (evt, action) {
     if (evt.key === ESC_KEY) {
@@ -36,6 +40,13 @@
     levelDepth.style.width = MAX_EFFECT_VALUE + '%';
   };
 
+  var resetForm = function () {
+    imgUploadInput.value = '';
+    hashtagsInput.value = '';
+    commentUploadInput.value = '';
+    effectOriginalInput.checked = true;
+  };
+
   window.util = {
     isEscEvent: isEscEvent,
     isEnterEvent: isEnterEvent,
@@ -45,6 +56,7 @@
     picturePreview: picturePreview,
     pin: pin,
     pictureScale: pictureScale,
-    levelBlock: levelBlock
+    levelBlock: levelBlock,
+    resetForm: resetForm
   };
 })();
