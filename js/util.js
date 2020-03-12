@@ -30,7 +30,7 @@
     picturePreview.removeAttribute('class');
     picturePreview.removeAttribute('style');
     picturePreview.style.transform = 'scale(' + MAX_EFFECT_VALUE / MAX_EFFECT_VALUE + ')';
-    pictureScale.value = MAX_EFFECT_VALUE + '%';
+    pictureScale.value = MAX_EFFECT_VALUE;
     levelValue.value = MAX_EFFECT_VALUE;
     pin.style.left = MAX_EFFECT_VALUE + '%';
     levelDepth.style.width = MAX_EFFECT_VALUE + '%';
