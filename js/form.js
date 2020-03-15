@@ -2,7 +2,6 @@
 
 (function () {
   var body = document.querySelector('body');
-  var pictureBig = document.querySelector('.big-picture');
   var uploadPicture = document.querySelector('#upload-file');
   var editPicture = document.querySelector('.img-upload__overlay');
   var uploadCancel = editPicture.querySelector('#upload-cancel');
@@ -12,10 +11,6 @@
   // Загрузка изображения и показ формы редактирования
   var onDialogEcsPress = function (evt) {
     window.util.isEscEvent(evt, closeDialog);
-  };
-
-  var onPreviewEscPress = function (evt) {
-    window.util.isEscEvent(evt, closePreview);
   };
 
   var onInputHashtagFocus = function () {
@@ -43,12 +38,6 @@
   var closeDialog = function () {
     editPicture.classList.add('hidden');
     uploadPicture.textContent = '';
-    body.classList.remove('modal-open');
-    document.removeEventListener('keydown', onDialogEcsPress);
-  };
-
-  var closePreview = function () {
-    pictureBig.classList.add('hidden');
     body.classList.remove('modal-open');
     document.removeEventListener('keydown', onDialogEcsPress);
   };
@@ -82,9 +71,7 @@
   };
 
   window.form = {
-    closePreview: closePreview,
-    closeDialog: closeDialog,
-    onPreviewEscPress: onPreviewEscPress
+    closeDialog: closeDialog
   };
 
 })();
