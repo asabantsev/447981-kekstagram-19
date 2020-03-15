@@ -8,8 +8,10 @@
   };
   var TIMEOUT_IN_MS = 10000;
 
-  var load = function (onLoad, onError) {
+  //
+  var request = function (method, url, onLoad, onError, data) {
     var xhr = new XMLHttpRequest();
+
     xhr.responseType = 'json';
 
     xhr.addEventListener('load', function () {
@@ -30,28 +32,18 @@
 
     xhr.timeout = TIMEOUT_IN_MS;
 
-    xhr.open('GET', URL_LOAD);
-    xhr.send();
+    xhr.open(method, url);
+    xhr.send(data);
   };
 
+  //
+  var load = function (onLoad, onError) {
+    request('GET', URL_LOAD, onLoad, onError);
+  };
+
+  //
   var save = function (data, onLoad, onError) {
-    var xhr = new XMLHttpRequest();
-    xhr.responseType = 'json';
-
-    xhr.addEventListener('load', function () {
-      if (xhr.status === StatusCode.OK) {
-        onLoad(xhr.response);
-      } else {
-        onError('Статус ответа: ' + xhr.status + ' ' + xhr.statusText);
-      }
-    });
-
-    xhr.addEventListener('error', function () {
-      onError('Произошла ошибка соединения');
-    });
-
-    xhr.open('POST', URL_SAVE);
-    xhr.send(data);
+    request('POST', URL_SAVE, onLoad, onError, data);
   };
 
   window.backend = {

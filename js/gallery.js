@@ -4,7 +4,6 @@
   var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
   var userPictures = document.querySelector('.pictures');
 
-  // отрисовка фотографии по шаблону
   var renderPhoto = function (photo) {
     var pictureElement = pictureTemplate.cloneNode(true);
 
@@ -24,7 +23,7 @@
     window.preview.renderPictureBig(photos);
   };
 
-  var successHandler = function (photos) {
+  window.successHandler = function (photos) {
     var fragment = document.createDocumentFragment();
 
     photos.forEach(function (photo) {
@@ -34,7 +33,7 @@
     userPictures.appendChild(fragment);
   };
 
-  var errorHandler = function (errorMessage) {
+  window.errorHandler = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
     node.style.position = 'absolute';
@@ -46,6 +45,6 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
-  window.backend.load(successHandler, errorHandler);
+  window.backend.load(window.successHandler, window.errorHandler);
 })();
 

@@ -29,6 +29,12 @@
     }
   };
 
+  var generateRandomNumber = function (min, max) {
+    var randomNumber = Math.floor(min + Math.random() * (max + 1 - min));
+
+    return randomNumber;
+  };
+
   var resetUserImgSettings = function () {
     levelBlock.classList.add('hidden');
     picturePreview.removeAttribute('class');
@@ -50,6 +56,7 @@
   window.util = {
     isEscEvent: isEscEvent,
     isEnterEvent: isEnterEvent,
+    generateRandomNumber: generateRandomNumber,
     resetUserImgSettings: resetUserImgSettings,
     uploadField: uploadField,
     maxEffectValue: MAX_EFFECT_VALUE,
