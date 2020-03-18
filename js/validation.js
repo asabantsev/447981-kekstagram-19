@@ -11,62 +11,46 @@
   var HASHTAGS_MAX_COUNT = 5;
   var HASHTAG_MAX_LENGTH = 20;
 
-  var inputHashtag = document.querySelector('.text__hashtags');
+  var inputHashtag = window.util.uploadField.querySelector('.text__hashtags');
 
-  // Валидация хеш-тегов
-  var detectDuplicateHashtag = function (hashtags) {
-    var flag = false;
+  var detectDuplicateHashtag = function (tag, index, hashes) {
+    var tags = hashes.slice(0);
 
-    for (var i = 0; i < hashtags.length; i++) {
-      for (var j = i + 1; j < hashtags.length; j++) {
-        if (hashtags[i].toLowerCase() === hashtags[j].toLowerCase()) {
-          flag = true;
-        }
-      }
-    }
+    tags.splice(index, 1);
 
-    return flag;
-  };
-
-  var removeSpacesInHashtags = function (hashtags) {
-
-    for (var i = 0; i < hashtags.length; i++) {
-      if (hashtags[i] === '') {
-        hashtags.splice(i, 1);
-        i--;
-      }
-    }
+    return tags
+      .map(function (hashtag) {
+        return hashtag.toLowerCase();
+      })
+      .includes(tag.toLowerCase());
   };
 
   var validateHashtags = function (evt) {
-    var hashtags = evt.target.value.split(' ');
+    var hashes = evt.target.value
+      .split(' ')
+      .filter(function (tag) {
+        return tag;
+      });
 
-    removeSpacesInHashtags(hashtags);
+    evt.target.removeAttribute('style');
 
     var errorMessage = '';
 
-    for (var i = 0; i < hashtags.length; i++) {
-      switch (true) {
-        case hashtags[i].length > 0 && hashtags[i][0] !== '#':
-          errorMessage = ERROR_MESSAGES[0];
-          break;
-        case hashtags[i] === '#':
-          errorMessage = ERROR_MESSAGES[1];
-          break;
-        case detectDuplicateHashtag(hashtags):
-          errorMessage = ERROR_MESSAGES[2];
-          break;
-        case hashtags.length > HASHTAGS_MAX_COUNT:
-          errorMessage = ERROR_MESSAGES[3];
-          break;
-        case hashtags[i].length > HASHTAG_MAX_LENGTH:
-          errorMessage = ERROR_MESSAGES[4];
-          break;
+    hashes.forEach(function (tag, index) {
+      if (tag[0] !== '#') {
+        errorMessage = ERROR_MESSAGES[0];
+      } else if (tag === '#') {
+        errorMessage = ERROR_MESSAGES[1];
+      } else if (detectDuplicateHashtag(tag, index, hashes)) {
+        errorMessage = ERROR_MESSAGES[2];
+      } else if (hashes.length > HASHTAGS_MAX_COUNT) {
+        errorMessage = ERROR_MESSAGES[3];
+      } else if (tag.length > HASHTAG_MAX_LENGTH) {
+        errorMessage = ERROR_MESSAGES[4];
       }
-    }
+    });
 
-    inputHashtag = evt.target.setCustomValidity(errorMessage);
-
+    evt.target.setCustomValidity(errorMessage);
   };
 
   var oninputHashtagChange = function (evt) {

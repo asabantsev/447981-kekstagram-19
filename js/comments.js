@@ -12,7 +12,7 @@
   var commentsCopy = [];
   var count = 0;
 
-  var commentsCounterBlock = function (loadedComments) {
+  var renderCommentsCounterBlock = function (loadedComments) {
     commentsCounter.textContent = '';
     var commentsCountBlockContent = loadedComments + ' из <span class="comments-count">' + count +
       '</span> комментариев';
@@ -32,7 +32,7 @@
       commentsContainer.insertAdjacentHTML('beforeend', htmlComment);
     });
 
-    commentsCounterBlock(commentsContainer.querySelectorAll('.social__comment').length);
+    renderCommentsCounterBlock(commentsContainer.querySelectorAll('.social__comment').length);
   };
 
   var renderCommentsList = function (photo) {
@@ -43,7 +43,7 @@
       commentsCounter.classList.remove('hidden');
       commentsLoader.classList.remove('hidden');
 
-      renderComments(commentsCopy.splice(0, 5));
+      renderComments(commentsCopy.splice(0, COMMENTSLIMIT));
     } else {
       commentsCounter.classList.add('hidden');
       commentsLoader.classList.add('hidden');
@@ -52,8 +52,8 @@
     }
   };
 
-  var loadComments = function () {
-    renderComments(commentsCopy.splice(0, 5));
+  var onCommentsLoaderClick = function () {
+    renderComments(commentsCopy.splice(0, COMMENTSLIMIT));
 
     if (commentsCopy.length === 0) {
       commentsLoader.classList.add('hidden');
@@ -69,9 +69,9 @@
   };
 
   window.comments = {
-    loadComments: loadComments,
-    renderCommentsList: renderCommentsList,
-    removeComments: removeComments
+    onLoaderClick: onCommentsLoaderClick,
+    renderList: renderCommentsList,
+    remove: removeComments
   };
 
 })();

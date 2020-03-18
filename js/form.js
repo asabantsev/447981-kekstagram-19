@@ -33,12 +33,14 @@
       document.addEventListener('keydown', onDialogEcsPress);
     });
     inputComment.addEventListener('focus', onInputCommentFocus);
+    window.renderUserPhoto();
   };
 
   var closeDialog = function () {
     editPicture.classList.add('hidden');
     uploadPicture.textContent = '';
     body.classList.remove('modal-open');
+    window.util.resetUserImgSettings();
     document.removeEventListener('keydown', onDialogEcsPress);
   };
 
@@ -47,8 +49,7 @@
   });
 
   uploadCancel.addEventListener('click', function () {
-    closeDialog();
-    window.util.resetForm();
+    closeAndResetDialog();
   });
 
   var form = document.querySelector('.img-upload__form');
@@ -59,19 +60,18 @@
   });
 
   var onLoad = function () {
-    window.form.closeDialog();
-    window.util.resetForm();
+    closeAndResetDialog();
     window.openSuccessMessage();
   };
 
   var onError = function () {
-    window.form.closeDialog();
-    window.util.resetForm();
+    closeAndResetDialog();
     window.openErrorMessage();
   };
 
-  window.form = {
-    closeDialog: closeDialog
+  var closeAndResetDialog = function () {
+    closeDialog();
+    window.util.resetForm();
   };
 
 })();

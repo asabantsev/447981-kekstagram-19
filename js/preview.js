@@ -16,10 +16,10 @@
     pictureBig.querySelector('.comments-count').textContent = photos.comments.length;
     pictureBig.querySelector('.social__caption').textContent = photos.description;
 
-    window.comments.removeComments();
-    window.comments.renderCommentsList(photos);
+    window.comments.remove();
+    window.comments.renderList(photos);
 
-    commentsLoader.addEventListener('click', window.comments.loadComments);
+    commentsLoader.addEventListener('click', window.comments.onLoaderClick);
 
     document.addEventListener('keydown', onPictureBigEscPress);
   };
@@ -29,7 +29,7 @@
     body.classList.remove('modal-open');
 
     document.removeEventListener('keydown', onPictureBigEscPress);
-    commentsLoader.removeEventListener('click', window.comments.loadComments);
+    commentsLoader.removeEventListener('click', window.comments.onLoaderClick);
   };
 
   var onPictureBigEscPress = function (evt) {
