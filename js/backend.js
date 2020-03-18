@@ -1,12 +1,12 @@
 'use strict';
 
 (function () {
+  var TIMEOUT_IN_MS = 10000;
   var URL_LOAD = 'https://js.dump.academy/kekstagram/data';
   var URL_SAVE = 'https://js.dump.academy/kekstagram';
   var StatusCode = {
     OK: 200
   };
-  var TIMEOUT_IN_MS = 10000;
 
   //
   var request = function (method, url, onLoad, onError, data) {

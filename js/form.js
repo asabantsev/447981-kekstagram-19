@@ -2,7 +2,6 @@
 
 (function () {
   var body = document.querySelector('body');
-  var pictureBig = document.querySelector('.big-picture');
   var uploadPicture = document.querySelector('#upload-file');
   var editPicture = document.querySelector('.img-upload__overlay');
   var uploadCancel = editPicture.querySelector('#upload-cancel');
@@ -12,10 +11,6 @@
   // Загрузка изображения и показ формы редактирования
   var onDialogEcsPress = function (evt) {
     window.util.isEscEvent(evt, closeDialog);
-  };
-
-  var onPreviewEscPress = function (evt) {
-    window.util.isEscEvent(evt, closePreview);
   };
 
   var onInputHashtagFocus = function () {
@@ -38,18 +33,14 @@
       document.addEventListener('keydown', onDialogEcsPress);
     });
     inputComment.addEventListener('focus', onInputCommentFocus);
+    window.renderUserPhoto();
   };
 
   var closeDialog = function () {
     editPicture.classList.add('hidden');
     uploadPicture.textContent = '';
     body.classList.remove('modal-open');
-    document.removeEventListener('keydown', onDialogEcsPress);
-  };
-
-  var closePreview = function () {
-    pictureBig.classList.add('hidden');
-    body.classList.remove('modal-open');
+    window.util.resetUserImgSettings();
     document.removeEventListener('keydown', onDialogEcsPress);
   };
 
@@ -58,8 +49,7 @@
   });
 
   uploadCancel.addEventListener('click', function () {
-    closeDialog();
-    window.util.resetForm();
+    closeAndResetDialog();
   });
 
   var form = document.querySelector('.img-upload__form');
@@ -70,21 +60,18 @@
   });
 
   var onLoad = function () {
-    window.form.closeDialog();
-    window.util.resetForm();
+    closeAndResetDialog();
     window.openSuccessMessage();
   };
 
   var onError = function () {
-    window.form.closeDialog();
-    window.util.resetForm();
+    closeAndResetDialog();
     window.openErrorMessage();
   };
 
-  window.form = {
-    closePreview: closePreview,
-    closeDialog: closeDialog,
-    onPreviewEscPress: onPreviewEscPress
+  var closeAndResetDialog = function () {
+    closeDialog();
+    window.util.resetForm();
   };
 
 })();
