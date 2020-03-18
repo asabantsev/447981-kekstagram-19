@@ -6,10 +6,12 @@
     'Хеш-тег не может состоять только из символа "#"',
     'Один и тот же хэш-тег не может быть использован дважды',
     'Нельзя указать больше пяти хэш-тегов',
-    'Максимальная длина одного хэш-тега 20 символов, включая символ "#"'
+    'Максимальная длина одного хэш-тега 20 символов, включая символ "#"',
+    'Недопустимые символы'
   ];
   var HASHTAGS_MAX_COUNT = 5;
   var HASHTAG_MAX_LENGTH = 20;
+  var HASHTAG_PATTERN = /^([#]{1})([0-9a-zа-яё]{1,19})$/g;
 
   var inputHashtag = window.util.uploadField.querySelector('.text__hashtags');
 
@@ -47,6 +49,8 @@
         errorMessage = ERROR_MESSAGES[3];
       } else if (tag.length > HASHTAG_MAX_LENGTH) {
         errorMessage = ERROR_MESSAGES[4];
+      } else if (!tag.match(HASHTAG_PATTERN)) {
+        errorMessage = ERROR_MESSAGES[5];
       }
     });
 
